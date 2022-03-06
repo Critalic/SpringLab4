@@ -13,6 +13,7 @@ public class MainDao {
     public synchronized void addCurrency(Rate rate, LocalDate date) {}
     public synchronized void editCurrency(Rate rate, LocalDate date) {}
     public synchronized void deleteCurrency(String currencyCode, LocalDate date) {}
+    public synchronized void deleteRateByDate(LocalDate date) {}
 
     public synchronized void addRateByDate(RateByDate rateByDate) {}
 }
