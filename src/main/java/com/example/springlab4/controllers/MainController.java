@@ -1,8 +1,11 @@
 package com.example.springlab4.controllers;
 
+import com.example.springlab4.dao.MainDao;
 import com.example.springlab4.model.RateByDate;
+import com.example.springlab4.service.MainService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,12 +15,17 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
 
-@RestController("/main")
+@Controller("/main")
 public class MainController {
+    private final MainService mainService;
+
+    public MainController(MainService mainService) {
+        this.mainService = mainService;
+    }
 
     @GetMapping()
     ResponseEntity<String> read() {
-        if(new Random().nextInt()<10) {
+        if (new Random().nextInt() < 10) {
             return ResponseEntity
                     .status(HttpStatus.I_AM_A_TEAPOT)
                     .body("Random is less than 10");
