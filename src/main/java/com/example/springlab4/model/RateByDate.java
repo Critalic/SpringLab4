@@ -8,6 +8,7 @@ public class RateByDate {
     private HashSet<Rate> currencies;
 
     public RateByDate() {
+        this.currencies = new HashSet<>();
     }
 
     public RateByDate(LocalDate date,  HashSet<Rate> currencies) {

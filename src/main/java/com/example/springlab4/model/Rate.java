@@ -4,8 +4,8 @@ import java.util.Currency;
 import java.util.Objects;
 
 public class Rate {
-    private final Currency currency;
-    private final double courseToUAH;
+    private Currency currency;
+    private double courseToUAH;
 
     public Rate(String currency, double courseToUAH) {
         this.currency = Currency.getInstance(currency);
@@ -14,6 +14,14 @@ public class Rate {
 
     public Currency getCurrency() {
         return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public void setCourseToUAH(double courseToUAH) {
+        this.courseToUAH = courseToUAH;
     }
 
     public double getCourseToUAH() {

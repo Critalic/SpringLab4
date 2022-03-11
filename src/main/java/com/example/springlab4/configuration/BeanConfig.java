@@ -1,19 +1,18 @@
 package com.example.springlab4.configuration;
 
 import com.example.springlab4.dao.MainDao;
+import com.example.springlab4.dao.MainDaoImpl;
 import com.example.springlab4.model.Rate;
 import com.example.springlab4.model.RateByDate;
-import org.mockito.Answers;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
+import java.sql.BatchUpdateException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.HashSet;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -27,30 +26,40 @@ public class BeanConfig {
         this.rates = this.getRateByDate();
     }
 
-    @Bean
-    public MainDao mainDao () {
+    @Bean("mock")
+    public MainDao mainDaoMock() {
         MainDao mainDao = Mockito.mock(MainDao.class);
+
         Mockito.when(mainDao.getRates()).thenReturn(rates);
+
         Mockito.doAnswer(invocationOnMock -> {
             LocalDate localDate = invocationOnMock.getArgument(1, LocalDate.class);
-
-            return rates.stream().noneMatch(rateByDate -> rateByDate.getDate().equals(localDate));
-
+            if (rates.stream().anyMatch(rateByDate -> rateByDate.getDate().equals(localDate))) {
+                return true;
+            }
+            throw new BatchUpdateException();
         }).when(mainDao).addCurrency(any(Rate.class), any(LocalDate.class));
 
         Mockito.doAnswer(invocationOnMock -> {
             String curr = invocationOnMock.getArgument(0, String.class);
             LocalDate localDate = invocationOnMock.getArgument(1, LocalDate.class);
 
-            return Currency.getAvailableCurrencies().stream().anyMatch(cur -> cur.getCurrencyCode().equals(curr)) &&
-                    rates.stream()
-                            .filter(rateByDate -> rateByDate.getDate().equals(localDate))
-                            .anyMatch(rateByDate -> rateByDate.getCurrencies().stream()
-                                    .anyMatch(currency -> currency.getCurrency().getCurrencyCode().equals(curr)));
-
+            if (rates.stream()
+                    .filter(rateByDate -> rateByDate.getDate().equals(localDate))
+                    .anyMatch(rateByDate -> rateByDate.getCurrencies().stream()
+                            .anyMatch(currency -> currency.getCurrency().getCurrencyCode().equals(curr)))) {
+                return true;
+            }
+            throw new BatchUpdateException();
         }).when(mainDao).deleteCurrency(anyString(), any(LocalDate.class));
+
 //        Mockito.doAnswer().when(mainDao.addCurrency(any(Rate.class), any(LocalDate.class))).then();
         return mainDao;
+    }
+
+    @Bean("impl")
+    public MainDao mainDaoImpl() {
+       return new MainDaoImpl(rates);
     }
 
     private ArrayList<RateByDate> getRateByDate() {
@@ -58,17 +67,17 @@ public class BeanConfig {
         HashSet<Rate> currencies1 = new HashSet<>();
         currencies1.add(new Rate("USD", 28.7));
         currencies1.add(new Rate("EUR", 32.7));
-        currencies1.add(new Rate("GBP", 38.7));
+        currencies1.add(new Rate("GBP", 39.7));
 
         HashSet<Rate> currencies2 = new HashSet<>();
-        currencies1.add(new Rate("USD", 27.7));
-        currencies1.add(new Rate("EUR", 31.7));
-        currencies1.add(new Rate("GBP", 36.7));
+        currencies2.add(new Rate("USD", 27.7));
+        currencies2.add(new Rate("EUR", 31.7));
+        currencies2.add(new Rate("GBP", 36.7));
 
         HashSet<Rate> currencies3 = new HashSet<>();
-        currencies1.add(new Rate("USD", 27.2));
-        currencies1.add(new Rate("EUR", 31.2));
-        currencies1.add(new Rate("GBP", 36.3));
+        currencies3.add(new Rate("USD", 27.2));
+        currencies3.add(new Rate("EUR", 31.2));
+        currencies3.add(new Rate("GBP", 36.3));
 
         rates.add(new RateByDate(
                 LocalDate.of(2022, Month.JANUARY, 10), currencies1));

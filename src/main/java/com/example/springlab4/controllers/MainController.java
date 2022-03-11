@@ -1,7 +1,5 @@
 package com.example.springlab4.controllers;
 
-import com.example.springlab4.dao.MainDao;
-import com.example.springlab4.model.RateByDate;
 import com.example.springlab4.service.MainService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Random;
 
 @Controller("/main")
