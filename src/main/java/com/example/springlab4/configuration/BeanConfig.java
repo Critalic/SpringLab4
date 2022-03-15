@@ -1,13 +1,12 @@
 package com.example.springlab4.configuration;
 
-import com.example.springlab4.dao.MainDao;
-import com.example.springlab4.dao.MainDaoImpl;
+import com.example.springlab4.dao.MainRepository;
+import com.example.springlab4.dao.MainRepositoryImpl;
 import com.example.springlab4.model.Rate;
 import com.example.springlab4.model.RateByDate;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 import java.sql.BatchUpdateException;
 import java.time.LocalDate;
@@ -27,10 +26,10 @@ public class BeanConfig {
     }
 
     @Bean("mock")
-    public MainDao mainDaoMock() {
-        MainDao mainDao = Mockito.mock(MainDao.class);
+    public MainRepository mainDaoMock() {
+        MainRepository mainRepository = Mockito.mock(MainRepository.class);
 
-        Mockito.when(mainDao.getRates()).thenReturn(rates);
+        Mockito.when(mainRepository.getRates()).thenReturn(rates);
 
         Mockito.doAnswer(invocationOnMock -> {
             LocalDate localDate = invocationOnMock.getArgument(1, LocalDate.class);
@@ -38,7 +37,7 @@ public class BeanConfig {
                 return true;
             }
             throw new BatchUpdateException();
-        }).when(mainDao).addCurrency(any(Rate.class), any(LocalDate.class));
+        }).when(mainRepository).addCurrency(any(Rate.class), any(LocalDate.class));
 
         Mockito.doAnswer(invocationOnMock -> {
             String curr = invocationOnMock.getArgument(0, String.class);
@@ -51,15 +50,33 @@ public class BeanConfig {
                 return true;
             }
             throw new BatchUpdateException();
-        }).when(mainDao).deleteCurrency(anyString(), any(LocalDate.class));
+        }).when(mainRepository).deleteCurrency(anyString(), any(LocalDate.class));
 
-//        Mockito.doAnswer().when(mainDao.addCurrency(any(Rate.class), any(LocalDate.class))).then();
-        return mainDao;
+        Mockito.doAnswer(invocationOnMock -> {
+            RateByDate rateByDate = invocationOnMock.getArgument(0, RateByDate.class);
+
+            if (rates.stream()
+                    .anyMatch(rate -> rate.getDate().equals(rateByDate.getDate()))) {
+                throw new BatchUpdateException();
+            }
+            return true;
+        }).when(mainRepository).addRateByDate(any(RateByDate.class));
+
+        Mockito.doAnswer(invocationOnMock -> {
+        LocalDate date = invocationOnMock.getArgument(0, LocalDate.class);
+            if (rates.stream()
+                    .noneMatch(rate -> rate.getDate().equals(date))) {
+                throw new BatchUpdateException();
+            }
+            return true;
+        }).when(mainRepository).deleteRateByDate(any(LocalDate.class));
+
+        return mainRepository;
     }
 
     @Bean("impl")
-    public MainDao mainDaoImpl() {
-       return new MainDaoImpl(rates);
+    public MainRepository mainDaoImpl() {
+       return new MainRepositoryImpl(rates);
     }
 
     private ArrayList<RateByDate> getRateByDate() {

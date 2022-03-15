@@ -6,7 +6,7 @@ import com.example.springlab4.model.RateByDate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-public interface MainDao {
+public interface MainRepository {
     ArrayList<RateByDate> getRates();
 
     void addCurrency(Rate rate, LocalDate date);

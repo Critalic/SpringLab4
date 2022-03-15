@@ -6,10 +6,10 @@ import com.example.springlab4.model.RateByDate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-public class MainDaoImpl implements MainDao {
+public class MainRepositoryImpl implements MainRepository {
     private final ArrayList<RateByDate> rateByDates;
 
-    public MainDaoImpl(ArrayList<RateByDate> rateByDates) {
+    public MainRepositoryImpl(ArrayList<RateByDate> rateByDates) {
         this.rateByDates = rateByDates;
     }
 
