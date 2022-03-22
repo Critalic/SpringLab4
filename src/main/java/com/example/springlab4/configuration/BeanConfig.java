@@ -63,7 +63,7 @@ public class BeanConfig {
         }).when(mainRepository).addRateByDate(any(RateByDate.class));
 
         Mockito.doAnswer(invocationOnMock -> {
-        LocalDate date = invocationOnMock.getArgument(0, LocalDate.class);
+            LocalDate date = invocationOnMock.getArgument(0, LocalDate.class);
             if (rates.stream()
                     .noneMatch(rate -> rate.getDate().equals(date))) {
                 throw new BatchUpdateException();
@@ -76,7 +76,7 @@ public class BeanConfig {
 
     @Bean("impl")
     public MainRepository mainDaoImpl() {
-       return new MainRepositoryImpl(rates);
+        return new MainRepositoryImpl(rates);
     }
 
     private ArrayList<RateByDate> getRateByDate() {
