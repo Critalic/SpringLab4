@@ -12,8 +12,8 @@ import java.security.InvalidParameterException;
 import java.sql.BatchUpdateException;
 
 @RestController()
+@RequestMapping("/api/rates")
 public class RstController {
-    private static final String DEFAULT_MAPPING = "/api/rates";
 
     private final MainService mainService;
 
@@ -21,7 +21,7 @@ public class RstController {
         this.mainService = mainService;
     }
 
-    @DeleteMapping(DEFAULT_MAPPING + "/{date}/currency/{code}")
+    @DeleteMapping("/{date}/currency/{code}")
     public ResponseEntity<String> deleteCurrency(@PathVariable String date, @PathVariable String code) {
         try {
             mainService.deleteCurrency(mainService.validateCurrencyCode(code), mainService.parseDate(date));
@@ -33,7 +33,7 @@ public class RstController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PutMapping(DEFAULT_MAPPING + "/{date}/currency/{code}")
+    @PutMapping("/{date}/currency/{code}")
     public ResponseEntity<String> addCurrency(
             @PathVariable String date, @PathVariable String code, @RequestParam double rate) {
         try {
@@ -44,7 +44,7 @@ public class RstController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping(value = DEFAULT_MAPPING + "/{date}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{date}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getSpecifiedRate(@PathVariable String date) { //TODO: analyze <?> use
         try {
             return new ResponseEntity<>(
@@ -54,7 +54,7 @@ public class RstController {
         }
     }
 
-    @PostMapping(DEFAULT_MAPPING)
+    @PostMapping()
     public ResponseEntity<String> addRateByDate(@RequestParam String date, @RequestBody Rate ...rates) {
         try {
             mainService.addRateByDate(date, rates);
@@ -66,7 +66,7 @@ public class RstController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @DeleteMapping(DEFAULT_MAPPING + "/{date}")
+    @DeleteMapping("/{date}")
     public ResponseEntity<String> deleteRateByDate(@PathVariable String date) {
         try {
             mainService.deleteRateByDate(mainService.parseDate(date));
